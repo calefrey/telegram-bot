@@ -2,6 +2,8 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 import logging, os, time
 
+from ftplib import FTP
+
 token = os.environ.get("TELEGRAM_TOKEN")
 
 logging.basicConfig(
@@ -24,14 +26,25 @@ def start(update, context):
 
 
 def upload(update, context):
-    def save_photo(photo_id, filename) -> bool:
+    def save_photo(photo_id, filename):
         # save the photo to the bot server
+        update.message.reply_text("Uploading...")
         context.bot.get_file(photo_id).download(filename)
-        # Save to Impromed server
-        #
-        #
-        #
-        return True
+        with open(filename, "rb") as f:
+            try:
+                with FTP("PDC1.clinic.vet") as ftp:
+                    ftp.login()
+                    ftp.storbinary("STOR " + filename, f)
+                update.message.reply_text(f"Uploaded as {filename}")
+            except Exception as e:
+                logger.error(e)
+                update.message.reply_text("Failed to upload.")
+                update.message.reply_text("Please send the message below to Caleb:")
+                update.message.reply_text(str(e))
+
+        # delete the file from th bot server so it doesn't take up space
+        if os.path.exists(filename):
+            os.remove(filename)
 
     # saves the rest of the message as a string to be used as a filename
     user = update.message.from_user
@@ -44,6 +57,7 @@ def upload(update, context):
     # first photo in album
     if update.message.media_group_id != old_group_id:
         logger.info(f"Photo received from {user.first_name} {user.last_name}")
+        user_initials = f"{user.first_name[0]}{user.last_name[0]}"
         context.user_data["photo_index"] = 1
         # record the media group id, which is needed to determine if subsequent photos are in the same album
         context.user_data["media_group_id"] = update.message.media_group_id
@@ -51,7 +65,7 @@ def upload(update, context):
         # get caption or make one up
         caption = update.message.caption
         if not caption:  # caption specified
-            caption = user.first_name + time.strftime("-%Y%m%d-%H%M")
+            caption = user_initials + time.strftime("-%Y%m%d-%H%M%S")
         context.user_data["caption"] = caption  # save the caption for later
 
         filename = caption + ".png"
@@ -64,30 +78,7 @@ def upload(update, context):
             context.user_data["caption"] + f"-{context.user_data['photo_index']}.png"
         )
 
-    update.message.reply_text(f"Uploading photo as {filename}...")
-    success = save_photo(photo_id, filename)
-    if success:
-        update.message.reply_text("Uploaded!")
-    else:
-        update.message.reply_text("There was an error")
-
-    # Download the best photo version
-
-    ## Unwritten code to upload to the server
-    #
-    #
-    #
-    #
-
-    # delete the photo from the bot server
-    # if os.path.exists(filename):
-    #     os.remove(filename)
-
-
-def help(update, context):
-    update.message.reply_text(
-        "Send an image with a caption to upload to the impromed server"
-    )
+    save_photo(photo_id, filename)
 
 
 def error(update, context):
@@ -103,7 +94,6 @@ def main():
 
     # Define command handlers
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
     dp.add_handler(MessageHandler(Filters.photo, upload))
 
     # Define message handlers
