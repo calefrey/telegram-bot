@@ -55,7 +55,7 @@ def upload(update, context):
     old_group_id = context.user_data.get("media_group_id", "0")  # defaults to 0
 
     # first photo in album
-    if update.message.media_group_id != old_group_id:
+    if update.message.media_group_id != old_group_id or update.message.media_group_id is None:
         logger.info(f"Photo received from {user.first_name} {user.last_name}")
         user_initials = f"{user.first_name[0]}{user.last_name[0]}"
         context.user_data["photo_index"] = 1
