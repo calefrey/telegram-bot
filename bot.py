@@ -5,6 +5,9 @@ import logging, os, time
 from ftplib import FTP
 
 token = os.environ.get("TELEGRAM_TOKEN")
+version = "1.2"
+starttime = time.strftime("%m/%d/%Y, %H:%M:%S")
+num_processed = 0
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -19,13 +22,42 @@ welcome_message = [
     "You can even upload multiple photos at once",
 ]
 
+about_message = [
+    "Helllo, I am the AVC Telegram Bot!",
+    "you can send me a photo and I'll upload it to the Impromed Server.",
+    "To start messaging me, tap my profile (the paw print) and tap the message buttom.",
+    "Also, FYI: I can only read messages that start with a /",
+]
+
 
 def start(update, context):
     logger.info("Bot Started")
     update.message.reply_text("\n".join(welcome_message))
 
 
+def about(update, context):
+    chat = update.message.chat
+    logger.info(
+        f"{update.message.from_user.username} requested the About message in {chat.title or chat.username}"
+    )
+    update.message.reply_text("\n".join(about_message))
+    pass
+
+
+def debug(update, context):
+    global num_processed
+    update.message.reply_text(
+        f"""
+AVC Telegram Bot, version {version}
+Started: {starttime}
+Number of pictures processed: {num_processed}"""
+    )
+
+
 def upload(update, context):
+    global num_processed
+    num_processed += 1
+
     def save_photo(photo_id, filename):
         # save the photo to the bot server
         update.message.reply_text("Uploading...")
@@ -94,6 +126,9 @@ def main():
 
     # Define command handlers
     dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("about", about))
+    dp.add_handler(CommandHandler("debug", debug))
+
     dp.add_handler(MessageHandler(Filters.photo, upload))
 
     # Define message handlers
