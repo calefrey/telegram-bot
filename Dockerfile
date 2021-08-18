@@ -1,5 +1,5 @@
 FROM python:3.7-slim
 WORKDIR /app
-RUN pip3 install python-telegram-bot
 COPY . .
+RUN pip3 install python-telegram-bot
 CMD ["python3", "bot.py"]
