@@ -5,7 +5,12 @@ from telegram.ext import (
     Filters,
     ConversationHandler,
 )
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+)
 import logging, os, time
 
 from ftplib import FTP
@@ -47,7 +52,19 @@ def about(update, context):
     logger.info(
         f"{update.message.from_user.username} requested the About message in {chat.title or chat.username}"
     )
-    update.message.reply_text("\n".join(about_message))
+    update.message.reply_text(
+        "\n".join(about_message),
+        reply_markup=InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        "Source Code available on Github",
+                        url="https://github.com/calefrey/telegram-bot",
+                    )
+                ]
+            ]
+        ),
+    )
     pass
 
 
