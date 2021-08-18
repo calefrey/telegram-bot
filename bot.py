@@ -15,8 +15,7 @@ import logging, os, time
 
 from ftplib import FTP
 
-# token = os.environ.get("TELEGRAM_TOKEN")
-from secret import token
+token = os.environ.get("TELEGRAM_TOKEN")
 
 version = "1.4"
 starttime = time.strftime("%m/%d/%Y, %H:%M:%S")
