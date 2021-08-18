@@ -69,7 +69,7 @@ def about(update, context):
 
 
 feedback_message = [
-    "Your next message will be submitted, anonylmously, as feedback to management.",
+    "Your next message will be submitted, anonymously, as feedback to management.",
     "You can treat it like a suggestions box, but without the ability to recognize handwriting.",
     "This bot does not record any of this information. It just passes it along.",
     "If you want to cancel, just type /cancel",
