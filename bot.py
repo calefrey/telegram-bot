@@ -186,7 +186,9 @@ def main():
         ConversationHandler(
             entry_points=[CommandHandler("feedback", feedback)],
             states={
-                FEEDBACK: [MessageHandler(Filters.text, submit_feedback)],
+                FEEDBACK: [
+                    MessageHandler(Filters.text & ~Filters.command, submit_feedback)
+                ],
             },
             fallbacks=[CommandHandler("cancel", cancel)],
         )
