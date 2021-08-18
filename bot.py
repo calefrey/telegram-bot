@@ -47,10 +47,9 @@ def about(update, context):
 def debug(update, context):
     global num_processed
     update.message.reply_text(
-        f"""
-AVC Telegram Bot, version {version}
-Started: {starttime}
-Number of pictures processed: {num_processed}"""
+        f"AVC Telegram Bot, version {version}\n"
+        + f"Started at {starttime}\n"
+        + f"Processed {num_processed} pictures"
     )
 
 
