@@ -34,7 +34,7 @@ welcome_message = [
 
 about_message = [
     f"AVC Telegram Bot, v{version}.",
-    "To start messaging me, tap my profile (the paw print) and tap the message buttom.",
+    "To start messaging me, tap my profile (the paw print) and tap the message button.",
 ]
 upload_instructions_message = [
     "To Upload a photo to the Impromed Server, touch the paperclip below, and select a photo.",
