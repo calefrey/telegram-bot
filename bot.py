@@ -1,11 +1,17 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-
+from telegram.ext import (
+    Updater,
+    CommandHandler,
+    MessageHandler,
+    Filters,
+    ConversationHandler,
+)
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 import logging, os, time
 
 from ftplib import FTP
 
 token = os.environ.get("TELEGRAM_TOKEN")
-version = "1.2"
+version = "1.3"
 starttime = time.strftime("%m/%d/%Y, %H:%M:%S")
 num_processed = 0
 
@@ -20,11 +26,13 @@ welcome_message = [
     "To Upload a photo to the Impromed Server, touch the paperclip below, and select a photo.",
     "If you add a caption to the photo it will be uses as the filename.",
     "You can even upload multiple photos at once",
+    "To send feedback, send the message /feedback",
 ]
 
 about_message = [
-    "Helllo, I am the AVC Telegram Bot!",
-    "you can send me a photo and I'll upload it to the Impromed Server.",
+    f"Helllo, I am the AVC Telegram Bot, v{version}.",
+    "You can send me a photo and I'll upload it to the Impromed Server.",
+    "I can also submit anonymous feedback to management as a virtual suggestion box."
     "To start messaging me, tap my profile (the paw print) and tap the message buttom.",
 ]
 
@@ -41,6 +49,34 @@ def about(update, context):
     )
     update.message.reply_text("\n".join(about_message))
     pass
+
+
+feedback_message = [
+    "Your next message will be submitted, anonylmously, as feedback to management.",
+    "You can treat it like a suggestions box, but without the ability to recognize handwriting.",
+    "This bot does not record any of this information. It just passes it along.",
+    "If you want to cancel, just type /cancel",
+]
+FEEDBACK = range(1)
+
+
+def feedback(update, context):
+    update.message.reply_text(
+        "\n".join(feedback_message),
+        reply_markup=ReplyKeyboardRemove(),
+    )
+    return FEEDBACK
+
+
+def cancel(update, context):
+    update.message.reply_text("Cancelled")
+    return ConversationHandler.END
+
+
+def submit_feedback(update, context):
+    update.message.reply_text("Thanks for your feedback!")
+    context.bot.send_message(chat_id="@avcfeedback", text=update.message.text)
+    return ConversationHandler.END
 
 
 def debug(update, context):
@@ -129,6 +165,15 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("about", about))
     dp.add_handler(CommandHandler("debug", debug))
+    dp.add_handler(
+        ConversationHandler(
+            entry_points=[CommandHandler("feedback", feedback)],
+            states={
+                FEEDBACK: [MessageHandler(Filters.text, submit_feedback)],
+            },
+            fallbacks=[CommandHandler("cancel", cancel)],
+        )
+    )
 
     dp.add_handler(MessageHandler(Filters.photo, upload))
 
