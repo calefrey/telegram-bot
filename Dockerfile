@@ -1,5 +1,4 @@
-# syntax=docker/dockerfile:1
-FROM python:3.7
+FROM python:3.7-slim
 WORKDIR /app
 RUN pip3 install python-telegram-bot
 COPY . .
