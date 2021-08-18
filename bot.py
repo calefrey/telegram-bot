@@ -26,7 +26,6 @@ about_message = [
     "Helllo, I am the AVC Telegram Bot!",
     "you can send me a photo and I'll upload it to the Impromed Server.",
     "To start messaging me, tap my profile (the paw print) and tap the message buttom.",
-    "Also, FYI: I can only read messages that start with a /",
 ]
 
 
