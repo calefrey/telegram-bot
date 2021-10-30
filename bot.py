@@ -15,26 +15,29 @@ import logging, os, time
 
 from ftplib import FTP
 
-token = os.environ.get("TELEGRAM_TOKEN")
-
-version = "1.4"
-starttime = time.strftime("%m/%d/%Y, %H:%M:%S")
-num_processed = 0
-
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
-
 logger = logging.getLogger(__name__)
+
+token = os.environ.get("TELEGRAM_TOKEN")
+if token is None:
+    logger.error("No Telegram token specified")
+    exit(1)
+
+version = "1.4.2"
+starttime = time.strftime("%m/%d/%Y, %H:%M:%S")
+num_processed = 0
+
 
 welcome_message = [
     "Welcome to the Alpha Vet Care Telegram Bot!",
-    "I can upload photos to the Impromed Server, and submit anonymous feedback",
+    "I can upload photos to the Impromed Server and submit anonymous feedback to management for you.",
 ]
 
 about_message = [
     f"AVC Telegram Bot, v{version}.",
-    "To start messaging me, tap my profile (the paw print) and tap the message button.",
+    "To start a conversation with me, tap the button below.",
 ]
 upload_instructions_message = [
     "To Upload a photo to the Impromed Server, touch the paperclip below, and select a photo.",
@@ -64,10 +67,16 @@ def about(update, context):
             [
                 [
                     InlineKeyboardButton(
-                        "Source Code available on Github",
+                        "Tap here to message me!",
+                        url="https://t.me/alphavetbot",
+                    ),
+                ],
+                [
+                    InlineKeyboardButton(
+                        "Tap here to view my source code",
                         url="https://github.com/calefrey/telegram-bot",
-                    )
-                ]
+                    ),
+                ],
             ]
         ),
     )
